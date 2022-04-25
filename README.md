@@ -46,6 +46,8 @@ network.
 
 ## TODO: add more info about Pax and I
 
+## TODO: add job description and/or desired qualities in candidate?
+
 [Wexpert Systems](https://wexpert.systems) is an Urbit software and services
 company which offers full-service premium Urbit hosting on physical servers,
 with minimal dependence on Big Tech cloud services. Wexpert Systems sells Urbit
