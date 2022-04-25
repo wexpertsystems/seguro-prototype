@@ -32,15 +32,15 @@ members will all process these events and record them in their local event log
 but only the Seguro master will actually emit their side effects back to the
 network.
 
-## Event processing flow
+## Event Flow
 
-## Optimistic run-ahead
+## Optimistic Run-Ahead
 
-## Event log batching
+## Event Log Batching
 
-## Event log truncation
+## Event Log Truncation
 
-## Previous work
+## Previous Work
 
 [Some effort](https://github.com/urbit/urbit/commit/cfeb35e37be63f96bb50fe1f60e2f59e35c07258)
 towards a goal similar to Seguro's has already been performed by Tlon
@@ -50,14 +50,57 @@ champion it and provide resources and management so it can be finished. Rhe core
 architecture is sound and, given sufficient development resources, Seguro ought
 to be a reasonably achievable within a year's time.
 
+## Challenges
+
 # About Us
 
-## TODO: add more info about Pax and I
-
-## TODO: add job description and/or desired qualities in candidate?
+TODO: add more info about Pax and I  
+TODO: add job description and/or desired qualities in candidate?
 
 [Wexpert Systems](https://wexpert.systems) is an Urbit software and services
 company which offers full-service premium Urbit hosting on physical servers,
 with minimal dependence on Big Tech cloud services. Wexpert Systems sells Urbit
 planets to the public and offers bespoke hosting for stars and galaxies and
 their moons. Shop our planet store or contact us for hosting or other questions.
+
+# Milestones
+
+## Milestone 1 - Specification
+
+Expected Completion: 3-6 months
+
+Payment: $50,000
+
+Write a detailed technical specification and have it reviewed by the champion
+(and perhaps additional technical Urbit authorities), accordingly revised, and
+ultimately approved for implementation.
+
+Deliverables:
+
+- Publication of a set of Markdown documents
+
+## Milestone 2 - Implementation
+
+Expected Completion: 3-6 months
+
+Payment: $50,000
+
+Deliverables:
+
+- A merged PR in the `urbit/urbit` repository
+
+## Milestone 3 - Testing, Integration, Communication
+
+Expected Completion: 3 months
+
+Payment: $50,000
+
+Write a comprehensive test suite that guarantee operability of Seguro's
+specified features and use cases.
+
+Integrate Seguro features in a live hosting environment.
+
+Deliverables:
+
+- A merged PR in the `urbit/urbit` repository
+- Overview of Seguro and demonstration of working system on Urbit Developer Call
