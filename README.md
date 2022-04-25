@@ -1,17 +1,39 @@
-# Seguro
+# Seguro Bounty
+
+# Overview
 
 Seguro improves the Urbit binary's dependability by automatically replicating
 its event log.
 
-# Background
+## Problem
 
-Seguro, an improvement to `vere` (the Urbit runtime binary), replicates a ship's
-event log, providing resiliency and redundancy to a currently fault-intolerant
-Urbit program. When running Seguro, a hardware failure will result in some
-minimal amount of network downtime but should not cause data loss and therefore
-should never require a breach in order to gracefully recover.
+The [Urbit runtime](https://github.com/urbit/urbit/tree/master/pkg/urbit/vere)
+was designed to host just a single Urbit instance running in a Unix process,
+with a single file volume attached for its event log and checkpoints. For
+individuals running only one or a handful of ships, this architecture is
+satisfactory. For providing Urbit to the world as a new, decentralized,
+peer-to-peer network of personal servers, the current implementation has
+inarguably succeeded.
 
-# Design
+However, for a quickly maturing platform which needs to scale to meet enormous
+demand, current Urbit technology is not suitable. Its low dependability is one
+element which continues to prevent the Urbit community from building truly
+resilient and scalable hosting services.
+
+## Background
+
+**Seguro** is an upgrade to the Urbit binary which replicates a ship's event
+log, providing resiliency and redundancy to a currently fault-intolerant Urbit
+program. When running Seguro, a hardware failure will result in some minimal
+amount of network downtime but should not cause data loss and therefore should
+never require a breach in order to gracefully recover. Seguro is one component
+in service of an Urbit that can scale the globe.
+
+# Project Requirements
+
+> An articulation of what constitutes complete work. User stories, Figma
+> designs, interface specifications, and other technical constraints are all
+> examples of requirements.
 
 ![Seguro Architecture](https://user-images.githubusercontent.com/91502660/153295790-6eef34ff-9136-4bc2-8927-2b432525c07d.png)
 
@@ -50,20 +72,19 @@ champion it and provide resources and management so it can be finished. Rhe core
 architecture is sound and, given sufficient development resources, Seguro ought
 to be a reasonably achievable within a year's time.
 
-## Challenges
+# Worker Requirements
 
-# About Us
-
-TODO: add more info about Pax and I  
-TODO: add job description and/or desired qualities in candidate?
-
-[Wexpert Systems](https://wexpert.systems) is an Urbit software and services
-company which offers full-service premium Urbit hosting on physical servers,
-with minimal dependence on Big Tech cloud services. Wexpert Systems sells Urbit
-planets to the public and offers bespoke hosting for stars and galaxies and
-their moons. Shop our planet store or contact us for hosting or other questions.
+> A description of the skills and/or qualifications required of a prospective
+> worker. Technologies or skills known, years of experience, work schedule (e.g.
+> time availability), and demonstrable accomplishments are all examples of this.
 
 # Milestones
+
+> Logical segments of work that can be considered done on their own. Breaking
+> the project up into smaller pieces will help a new worker pick up the work
+> should that be necessary, keeps the worker motivated with incremental
+> achievement and remuneration, and is generally a sign of a clear
+> specification. Milestones don't always make sense; sometimes there's only one.
 
 ## Milestone 1 - Specification
 
@@ -104,3 +125,11 @@ Deliverables:
 
 - A merged PR in the `urbit/urbit` repository
 - Overview of Seguro and demonstration of working system on Urbit Developer Call
+
+# Timeline
+
+> If you're trying hit a certain deadline, make sure to specify absolute dates
+> on the milestones. Otherwise, use relative dates (e.g. two months) to give the
+> worker an idea of how long each milestone will take. This helps form an
+> agreement between benefactor and worker on volume of work, and grounds to seek
+> other arrangements should schedules be missed.
