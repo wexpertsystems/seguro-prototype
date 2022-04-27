@@ -75,8 +75,6 @@ An event log batching system could be designed and implemented to improve the
 performance of Seguro by way of reducing per-event processing and replication
 overhead (if there is any).
 
-## Features
-
 ## Snapshots & Event Log Truncation
 
 Seguro's support of optimistic run-ahead as defined in the Configuration section
