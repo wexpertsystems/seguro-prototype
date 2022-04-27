@@ -3,7 +3,7 @@
 # Overview
 
 Seguro improves the Urbit binary's dependability by automatically replicating
-its event log.
+its event log across a set of machines in a cluster.
 
 ## Problem
 
@@ -27,40 +27,67 @@ log, providing resiliency and redundancy to a currently fault-intolerant Urbit
 program. When running Seguro, a hardware failure will result in some minimal
 amount of network downtime but should not cause data loss and therefore should
 never require a breach in order to gracefully recover. Seguro is one component
-in service of an Urbit that can scale the globe.
+in service of an Urbit that can scale the globe with dependability high enough
+to trust Urbit with even the most critical workloads.
 
 # Project Requirements
 
-> An articulation of what constitutes complete work. User stories, Figma
-> designs, interface specifications, and other technical constraints are all
-> examples of requirements.
+## Potential Architecture Diagram
 
 ![Seguro Architecture](https://user-images.githubusercontent.com/91502660/153295790-6eef34ff-9136-4bc2-8927-2b432525c07d.png)
 
 Seguro will use [dqlite](https://dqlite.io) to store and replicate a ship's
-event log across a user-configurable number of replicas. In practice, the Urbit
-binary will receive the addition of the following runtime command-line options:
+event log across a user-configurable number of replicas. The Urbit binary will
+receive the addition of the following runtime command-line interface options:
 
-1. `-m machines` (or `-r replicas`) the comma-delimited list of IP:port
-   addresses to replicate the event log across
-2. ???
+1. `-m machines` (or `-r replicas`, or `-s slaves`) the comma-delimited list of
+   IP:port addresses to replicate the event log across
+2. `-o optimism` the number [0..m] of replications to wait for before emitting
+   an event's side effects
 
 ## Cluster
 
-A Seguro cluster will consist of an elected master and a set of replication
-slaves. Urbit network UDP events will be received by an IP-level load balancer
-which will then replicate them to all the members of the cluster. Cluster
-members will all process these events and record them in their local event log
-but only the Seguro master will actually emit their side effects back to the
-network.
+A Seguro cluster will consist of an elected master and `m` replication slaves
+(user-specified). Urbit network UDP events will be received by an IP-level load
+balancer (running standalone or on the master?) which will then replicate them
+to all the members of the cluster. Slaves will process these events and record
+them in their local event log but only the Seguro master will actually emit
+their side effects back to the Urbit network.
 
-## Event Flow
+## Performance
 
-## Optimistic Run-Ahead
+### Configuration
 
-## Event Log Batching
+Users will have the option to configure Seguro's degree of optimism. the number
+of healthy replicas must process an event before emitting its side effect from
+the master. For example, if set to 0, the master will receive, process and emit
+side effects from an event without waiting for any slaves in the cluster to
+acknowledge their successful reception and processing of said event. If set to
+N, where N is the number of slaves in the cluster, the master will wait for all
+of the slaves to process the event before emitting its side effects. 0 is most
+performant, N is most durable. In other words, setting a value of 0 tells Seguro
+to be "optimistic" about event replications, and N tells Seguro to be the
+opposite.
 
-## Event Log Truncation
+### Event Log Batching
+
+An event log batching system could be designed and implemented to improve the
+performance of Seguro by way of reducing per-event processing and replication
+overhead (if there is any).
+
+## Features
+
+## Snapshots & Event Log Truncation
+
+Seguro's support of optimistic run-ahead as defined in the Configuration section
+depends on coupling segments of the log to binary versions (for error handling
+and crash recovery), which depends on "epochs" and/or event log truncation.
+There is a [PR currently under review](https://github.com/urbit/urbit/pull/5701)
+which implements this feature. This PR assumes existence of a local log that can
+be subdivided into epochs where each epoch is coupled to a particular snapshot.
+If the log is moved off of the module, and epochs/truncation are supported,
+there will need to be some way to make sure that the relevant snapshots are
+persisted with the same durability on slave machines.
 
 ## Previous Work
 
@@ -72,29 +99,53 @@ champion it and provide resources and management so it can be finished. Rhe core
 architecture is sound and, given sufficient development resources, Seguro ought
 to be a reasonably achievable within a year's time.
 
+## Open Questions
+
+1. Should the ordering of (compute event, commit event, release effect) change?
+   Why? How?
+
+2. What is the nature of dqlite integration? Are we making a new kind of pipe
+   where we control both sides and the remote talks to an arbitrary database, or
+   does the database have a client SDK that gets pushed into the runtime?
+
+3. Should we "just" write a Nock hypervisor (have the runtime use a Nock core as
+   a hypervisor, rather than operating on the Arvo core)?
+
+4. What happens in case of failed nodes, master or slaves?
+5. How does automatic failover work?
+6. What are the recommended default settings for running Seguro in hosting
+   environments?
+
 # Worker Requirements
 
-> A description of the skills and/or qualifications required of a prospective
-> worker. Technologies or skills known, years of experience, work schedule (e.g.
-> time availability), and demonstrable accomplishments are all examples of this.
+Prospective candidates should have intermediate to advanced proficiency in the C
+programming language, a healthy appetite for Martian software (although no
+previous experienced with it is required), some previous experience with
+distributed systems, expertise in writing well-defined technical requirements
+and specifications, and strong coding and sytle habits. 3+ years of experience
+and a full-time commitment are also required. While no previous experience with
+Urbit is necessary, a candidate without it should be able to quickly demonstrate
+knowledge of the basics of the Urbit OS and its runtime (i.e., after reading the
+[whitepaper](https://media.urbit.org/whitepaper.pdf) or the relevant sections in
+the [docs](https://urbit.org/docs)).
 
 # Milestones
 
-> Logical segments of work that can be considered done on their own. Breaking
-> the project up into smaller pieces will help a new worker pick up the work
-> should that be necessary, keeps the worker motivated with incremental
-> achievement and remuneration, and is generally a sign of a clear
-> specification. Milestones don't always make sense; sometimes there's only one.
+A worker who can confidently commit to completion of the entire Seguro project,
+with all 3 of its milestones, is highly preferable. Guidance and leadership will
+be provided by ~mastyr-bottec of [Wexpert Systems](https://wexpert.systems).
+
+A salary of $125,000 will be paid to the work on a bi-weekly basis throughout
+the duration of the bounty (one year). If the work is completed before the year
+is complete, ???. If completed after, ???...
 
 ## Milestone 1 - Specification
 
-Expected Completion: 3-6 months
-
-Payment: $50,000
-
-Write a detailed technical specification and have it reviewed by the champion
+Write a detailed technical specification and have it reviewed by stakeholders
 (and perhaps additional technical Urbit authorities), accordingly revised, and
 ultimately approved for implementation.
+
+Expected Completion: 3 months
 
 Deliverables:
 
@@ -102,9 +153,12 @@ Deliverables:
 
 ## Milestone 2 - Implementation
 
-Expected Completion: 3-6 months
+Clean, legible code which clearly implements the specification. Where
+implementation of the specification as written is impossible or impractical, the
+specification should be updated accordingly after sufficient consideration and
+approval of the stakeholders.
 
-Payment: $50,000
+Expected Completion: 3 months
 
 Deliverables:
 
@@ -112,14 +166,11 @@ Deliverables:
 
 ## Milestone 3 - Testing, Integration, Communication
 
+Write a comprehensive test suite that guarantees operability of Seguro's
+specified features and use cases. Integrate Seguro features in a live hosting
+environment (maybe delete this one???).
+
 Expected Completion: 3 months
-
-Payment: $50,000
-
-Write a comprehensive test suite that guarantee operability of Seguro's
-specified features and use cases.
-
-Integrate Seguro features in a live hosting environment.
 
 Deliverables:
 
@@ -128,8 +179,4 @@ Deliverables:
 
 # Timeline
 
-> If you're trying hit a certain deadline, make sure to specify absolute dates
-> on the milestones. Otherwise, use relative dates (e.g. two months) to give the
-> worker an idea of how long each milestone will take. This helps form an
-> agreement between benefactor and worker on volume of work, and grounds to seek
-> other arrangements should schedules be missed.
+This bounty should take one year to complete.
