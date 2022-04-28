@@ -133,7 +133,7 @@ A worker who can confidently commit to completion of the entire Seguro project,
 with all 3 of its milestones, is highly preferable. Guidance and leadership will
 be provided by ~mastyr-bottec of [Wexpert Systems](https://wexpert.systems).
 
-A salary of $125,000 will be paid to the work on a bi-weekly basis throughout
+A salary of $XXX,XXX will be paid to the work on a bi-weekly basis throughout
 the duration of the bounty (one year). If the work is completed before the year
 is complete, ???. If completed after, ???...
 
@@ -143,7 +143,7 @@ Write a detailed technical specification and have it reviewed by stakeholders
 (and perhaps additional technical Urbit authorities), accordingly revised, and
 ultimately approved for implementation.
 
-Expected Completion: 3 months
+Expected Completion: ~3 months
 
 Deliverables:
 
@@ -156,7 +156,7 @@ implementation of the specification as written is impossible or impractical, the
 specification should be updated accordingly after sufficient consideration and
 approval of the stakeholders.
 
-Expected Completion: 3 months
+Expected Completion: ~3 months
 
 Deliverables:
 
@@ -168,7 +168,7 @@ Write a comprehensive test suite that guarantees operability of Seguro's
 specified features and use cases. Integrate Seguro features in a live hosting
 environment (maybe delete this one???).
 
-Expected Completion: 3 months
+Expected Completion: ~3 months
 
 Deliverables:
 
