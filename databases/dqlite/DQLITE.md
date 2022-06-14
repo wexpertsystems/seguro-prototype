@@ -16,7 +16,7 @@ published by Canonical.
 
 ```
 export CGO_LDFLAGS_ALLOW="-Wl,-z,now"
-go build -tags libsqlite3 -o dqlite-benchmark ./cmd/dqlite-benchmark
+go build -tags libsqlite3 ./cmd/dqlite-benchmark
 ```
 
 ## Run
@@ -28,16 +28,16 @@ Single-node benchmark:
 
 Run a multi-node benchmark with the master as the driver:
 ```
-dqlite-benchmark --db 127.0.0.1:9001 --driver --cluster 127.0.0.1:9001,127.0.0.1:9002,127.0.0.1:9003 &
-dqlite-benchmark --db 127.0.0.1:9002 --join 127.0.0.1:9001 &
-dqlite-benchmark --db 127.0.0.1:9003 --join 127.0.0.1:9001 &
+./dqlite-benchmark --db 127.0.0.1:9001 --driver --cluster 127.0.0.1:9001,127.0.0.1:9002,127.0.0.1:9003 &
+./dqlite-benchmark --db 127.0.0.1:9002 --join 127.0.0.1:9001 &
+./dqlite-benchmark --db 127.0.0.1:9003 --join 127.0.0.1:9001 &
 ```
 
 Run a multi-node benchmark with a replica node as the driver:
 ```
-dqlite-benchmark --db 127.0.0.1:9001 &
-dqlite-benchmark --db 127.0.0.1:9002 --join 127.0.0.1:9001 &
-dqlite-benchmark --db 127.0.0.1:9003 --join 127.0.0.1:9001 --driver --cluster 127.0.0.1:9001,127.0.0.1:9002,127.0.0.1:9003 &
+./dqlite-benchmark --db 127.0.0.1:9001 &
+./dqlite-benchmark --db 127.0.0.1:9002 --join 127.0.0.1:9001 &
+./dqlite-benchmark --db 127.0.0.1:9003 --join 127.0.0.1:9001 --driver --cluster 127.0.0.1:9001,127.0.0.1:9002,127.0.0.1:9003 &
 ```
 
 The results can be found on the `driver` node in `/tmp/dqlite-benchmark/127.0.0.1:9001/results` or in the directory provided to the tool.
