@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/canonical/go-dqlite/app"
-	"github.com/canonical/go-dqlite/benchmark"
 	"github.com/stretchr/testify/require"
+	"github.com/wexpertsystems/seguro/databases/dqlite/benchmark"
 )
 
 const (
