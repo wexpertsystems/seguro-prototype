@@ -34,7 +34,7 @@ const (
 	kvReaderWriter workerType = iota
 
 	kvReadSql  = "SELECT value FROM model WHERE key = ?"
-	kvWriteSql = "INSERT INTO model(key, value) VALUES(?, ?)"
+	kvWriteSql = "INSERT INTO model(value) VALUES(?)"
 )
 
 // A worker performs the queries to the database and keeps around some state
