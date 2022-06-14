@@ -11,7 +11,6 @@ import (
 
 	"github.com/canonical/go-dqlite/app"
 	"github.com/canonical/go-dqlite/client"
-	"github.com/wexpert/seguro/databases/dqlite/benchmark"
 )
 
 const (

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"benchmark"
 	"context"
 	"fmt"
 	"os"
@@ -10,9 +9,9 @@ import (
 	"time"
 
 	"github.com/canonical/go-dqlite/app"
-	// "github.com/canonical/go-dqlite/benchmark"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/wexpertsystems/seguro/databases/dqlite/benchmark"
 	"golang.org/x/sys/unix"
 )
 

@@ -1,4 +1,4 @@
-module wexpert.systems/seguro-dqlite
+module github.com/wexpertsystems/seguro
 
 go 1.18
 
