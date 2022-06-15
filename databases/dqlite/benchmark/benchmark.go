@@ -29,6 +29,8 @@ func createWorkers(o *options) []*worker {
 	workers := make([]*worker, o.nWorkers)
 	for i := 0; i < o.nWorkers; i++ {
 		switch o.workload {
+		case kvBatch:
+			workers[i] = newWorker(kvBatchWriter, o)
 		case kvWrite:
 			workers[i] = newWorker(kvWriter, o)
 		case kvReadWrite:

@@ -8,6 +8,7 @@ import (
 type workload int32
 
 const (
+	kvBatch     workload = iota
 	kvWrite     workload = iota
 	kvReadWrite workload = iota
 )
@@ -25,6 +26,8 @@ type options struct {
 
 func parseWorkload(workload string) workload {
 	switch strings.ToLower(workload) {
+	case "kvbatch":
+		return kvBatch
 	case "kvwrite":
 		return kvWrite
 	case "kvreadwrite":

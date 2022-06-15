@@ -138,7 +138,7 @@ func main() {
 		"The `driver` will wait for all nodes to be online before running the benchmark.")
 	flags.IntVar(&clusterTimeout, "cluster-timeout", defaultClusterTimeout, "How long the benchmark should wait in seconds for the whole cluster to be online.")
 	flags.StringVarP(&dir, "dir", "D", defaultDir, "Data directory.")
-	flags.StringVarP(&workload, "workload", "w", defaultWorkload, "The workload to run: \"kvwrite\" or \"kvreadwrite\".")
+	flags.StringVarP(&workload, "workload", "w", defaultWorkload, "The workload to run: \"kvwrite\", \"kvbatch\", or \"kvreadwrite\".")
 	flags.BoolVar(&driver, "driver", defaultDriver, "Set this flag to run the benchmark from this instance. Must be set on 1 node.")
 	flags.IntVar(&duration, "duration", defaultDurationS, "Run duration in seconds.")
 	flags.IntVar(&workers, "workers", defaultWorkers, "Number of workers executing the workload.")

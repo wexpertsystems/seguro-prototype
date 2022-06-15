@@ -14,6 +14,8 @@ func (w work) String() string {
 	switch w {
 	case exec:
 		return "exec"
+	case batch:
+		return "batch"
 	case query:
 		return "query"
 	case none:
@@ -27,12 +29,22 @@ const (
 	// The type of query to perform
 	none  work = iota
 	exec  work = iota // a `write`
+	batch work = iota // a batch `write`
 	query work = iota // a `read`
 
+	kvBatchWriter  workerType = iota
 	kvWriter       workerType = iota
 	kvReader       workerType = iota
 	kvReaderWriter workerType = iota
 
+	kvBatchWriteSql = `
+		INSERT INTO model (value) VALUES
+			(?),
+			(?),
+			(?),
+			(?),
+			(?)
+	`
 	kvReadSql  = "SELECT value FROM model WHERE key = ?"
 	kvWriteSql = "INSERT INTO model(value) VALUES(?)"
 )
@@ -66,6 +78,13 @@ func (w *worker) randValue() []byte {
 // Returns the type of work to execute and a sql statement with arguments
 func (w *worker) getWork() (work, string, []interface{}) {
 	switch w.workerType {
+	case kvBatchWriter:
+		a := w.randValue()
+		b := w.randValue()
+		c := w.randValue()
+		d := w.randValue()
+		e := w.randValue()
+		return batch, kvBatchWriteSql, []interface{}{a, b, c, d, e}
 	case kvWriter:
 		v := w.randValue()
 		return exec, kvWriteSql, []interface{}{v}
@@ -92,6 +111,13 @@ func (w *worker) doWork(ctx context.Context, db *sql.DB) {
 	w.lastArgs = args
 
 	switch work {
+	case batch:
+		w.kvLastKey = w.kvLastKey + 5
+		defer w.tracker.measure(time.Now(), work, &err)
+		_, err = db.ExecContext(ctx, q, args...)
+		if err != nil {
+			w.kvLastKey = w.kvLastKey - 5
+		}
 	case exec:
 		w.kvLastKey = w.kvLastKey + 1
 		defer w.tracker.measure(time.Now(), work, &err)
