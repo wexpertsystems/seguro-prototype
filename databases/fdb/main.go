@@ -28,20 +28,43 @@ func main() {
 	min := 999.99
 	sum := 0.0
 	var errors = 0
-	for i, e := range events {
+	// for i, e := range events {
+	// 	txStart := time.Now()
+	// 	_, err := db.Transact(func(tr fdb.Transaction) (ret interface{}, err error) {
+	// 		tr.Set(fdb.Key(fmt.Sprint(i)), e)
+	// 		return
+	// 	})
+	// 	if err == nil {
+	// 		txElapsed := float64(time.Since(txStart).Nanoseconds()) / 1000000.0
+	// 		sum = sum + txElapsed
+	// 		if txElapsed > max {
+	// 			max = txElapsed
+	// 		}
+	// 		if txElapsed < min {
+	// 			min = txElapsed
+	// 		}
+	// 	} else {
+	// 		errors++
+	// 	}
+	// }
+	for i := 0; i < len(events)-5; i += 5 {
 		txStart := time.Now()
 		_, err := db.Transact(func(tr fdb.Transaction) (ret interface{}, err error) {
-			tr.Set(fdb.Key(fmt.Sprint(i)), e)
+			tr.Set(fdb.Key(fmt.Sprint(i)), events[i])
+			tr.Set(fdb.Key(fmt.Sprint(i+1)), events[i+1])
+			tr.Set(fdb.Key(fmt.Sprint(i+2)), events[i+2])
+			tr.Set(fdb.Key(fmt.Sprint(i+3)), events[i+3])
+			tr.Set(fdb.Key(fmt.Sprint(i+4)), events[i+4])
 			return
 		})
 		if err == nil {
 			txElapsed := float64(time.Since(txStart).Nanoseconds()) / 1000000.0
 			sum = sum + txElapsed
-			if txElapsed > max {
-				max = txElapsed
+			if (txElapsed / 5.0) > max {
+				max = txElapsed / 5.0
 			}
-			if txElapsed < min {
-				min = txElapsed
+			if (txElapsed / 5.0) < min {
+				min = txElapsed / 5.0
 			}
 		} else {
 			errors++
