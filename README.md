@@ -131,9 +131,24 @@ however.
 
 In fact, FoundationDB is preferable in all of the following regards:
 
-- Performance (see above)
-- Production-readiness (FoundationDB is used in Apple CloudKit; Dqlite is a new,
-  unproven technology)
-- Documentation (Apple; Canonical)
-- API client language variety (FoundationDB has C/Go/Python/Ruby/Java; Dqlite
-  only has Go (C planned for future release))
+### Performance
+
+(See above.)
+
+### Production-readiness
+
+FoundationDB is used in Apple CloudKit. Dqlite is a new, unproven technology
+used nowhere in production.
+
+### Documentation
+
+Apple vs. Canonical, enough said.
+
+### API
+
+FoundationDB has official clients written in C/Go/Python/Ruby/Java. Dqlite only
+has Go, while C is planned for future release in fall 2022.
+
+While FoundationDB's C API is indeed very low-level, there already exists
+previous work to integrate it with `vere`, and the documentation is good, so the
+task is far from insurmountable.
