@@ -66,7 +66,12 @@ All benchmarks were performed on the same
 | max [ms] | 91.736463 | 16.663706 |
 | min [ms] | 8.023056  | 2.627436  |
 
+Winner: FoundationDB
+
 ### Batch writes
+
+`vere` often batches multiple events into single database commits when it can,
+so the results here are of particular importance.
 
 | database   | dqlite    | fdb      |
 | ---------- | --------- | -------- |
@@ -76,6 +81,8 @@ All benchmarks were performed on the same
 | avg [ms]   | 14.229881 | 0.739242 |
 | max [ms]   | 85.146681 | 2.399221 |
 | min [ms]   | 8.154588  | 0.573965 |
+
+Winner: FoundationDB
 
 ### Fragmented single writes
 
@@ -111,4 +118,22 @@ don't include fragmented benchmarks for it.
 
 ## Conclusion
 
-FoundationDB wins.
+**For Seguro, the right choice is FoundationDB.**
+
+Even with Dqlite's embedded architecture and lack of need for a fragmentation
+scheme, FoundationDB far outpaces it in both single and batch event writes.
+FoundationDB is 4x as fast on single writes, and 16x as fast with batches.
+
+In the minds of various Urbit runtime engineers over the years, Dqlite has long
+been considered the distributed database of choice for integration in `vere` for
+implementation of a fault-tolerant Urbit. These results indicate otherwise,
+however.
+
+In fact, FoundationDB is preferable in all of the following regards:
+
+- Performance (see above)
+- Production-readiness (FoundationDB is used in Apple CloudKit; Dqlite is a new,
+  unproven technology)
+- Documentation (Apple; Canonical)
+- API client language variety (FoundationDB has C/Go/Python/Ruby/Java; Dqlite
+  only has Go (C planned for future release))
