@@ -1,6 +1,6 @@
 # Seguro Prototype
 
-[Prototype Grant](https://urbit.org/grants/seguro-prototype)
+[Prototype Grant](https://urbit.org/grants/seguro-prototype)  
 [Seguro & Armada Whitepaper](https://gist.github.com/wexpert/0485a722185d5ee70742570036faf32f)
 
 ## Overview
