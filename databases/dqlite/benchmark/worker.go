@@ -65,7 +65,7 @@ type worker struct {
 }
 
 func (w *worker) randExistingKey() (int, error) {
-	return rand.Intn(w.kvLastKey-1) + 1, nil
+	return rand.Intn(w.kvLastKey) + 1, nil
 }
 
 // A random byte slice (mock event).

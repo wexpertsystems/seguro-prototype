@@ -1,180 +1,114 @@
-# Seguro Bounty
+# Seguro Prototype
 
-# Overview
+[Prototype Grant](https://urbit.org/grants/seguro-prototype)
+[Seguro & Armada Whitepaper](https://gist.github.com/wexpert/0485a722185d5ee70742570036faf32f)
 
-Seguro improves the Urbit binary's dependability by automatically replicating
-its event log across a set of machines in a cluster.
+## Overview
 
-## Problem
+This repository implements benchmarks for [Dqlite](https://dqlite.io) and
+[FoundationDB](https://foundationdb.org) to determine their suitability for
+integration with `vere` as part of the Seguro project.
 
-The [Urbit runtime](https://github.com/urbit/urbit/tree/master/pkg/urbit/vere)
-was designed to host just a single Urbit instance running in a Unix process,
-with a single file volume attached for its event log and checkpoints. For
-individuals running only one or a handful of ships, this architecture is
-satisfactory. For providing Urbit to the world as a new, decentralized,
-peer-to-peer network of personal servers, the current implementation has
-inarguably succeeded.
+## Databases
 
-However, for a quickly maturing platform which needs to scale to meet enormous
-demand, current Urbit technology is not suitable. Its low dependability is one
-element which continues to prevent the Urbit community from building truly
-resilient and scalable hosting services.
+### Dqlite
 
-## Background
+Dqlite is a distributed version of SQLite developed by Canonical. It adds a
+networking layer above SQLite to achieve data replication while retaining
+SQLite's embedded nature and also its ACID transaction compliance.
 
-**Seguro** is an upgrade to the Urbit binary which replicates a ship's event
-log, providing resiliency and redundancy to a currently fault-intolerant Urbit
-program. When running Seguro, a hardware failure will result in some minimal
-amount of network downtime but should not cause data loss and therefore should
-never require a breach in order to gracefully recover. Seguro is one component
-in service of an Urbit that can scale the globe with dependability high enough
-to trust Urbit with even the most critical workloads.
+### FoundationDB
 
-# Project Requirements
+FoundationDB is a distributed, multi-model database developed by Apple. It
+maintains ACID compliance and has a reputation for impressive performance and
+scalability.
 
-## Potential Architecture Diagram
+## Benchmarks
 
-![Seguro Architecture](https://user-images.githubusercontent.com/91502660/153295790-6eef34ff-9136-4bc2-8927-2b432525c07d.png)
+For the performance benchmarks, the test data was designed to simulate Urbit
+events as such:
 
-Seguro will use [dqlite](https://dqlite.io) to store and replicate a ship's
-event log across a user-configurable number of replicas. The Urbit binary will
-receive the addition of the following runtime command-line interface options:
+```
+<continuous integer keys> -> <arbitrarily sized byte buffer values>
+```
 
-1. `-m machines` (or `-r replicas`, or `-s slaves`) the comma-delimited list of
-   IP:port addresses to replicate the event log across
-2. `-o optimism` the number [0..m] of replications to wait for before emitting
-   an event's side effects
+Dqlite currently only has an official Go client available, with a C client
+planned for release with Ubuntu 20.10. FoundationDB has an official Go client as
+well. In order to control as many variables as possible, both benchmarks were
+implemented in Go. Instructions for building and execution can be found in the
+respective database directories.
 
-## Cluster
+With this simple data model, which database exhibits the best overall
+performance?
 
-A Seguro cluster will consist of an elected master and `m` replication slaves
-(user-specified). Urbit network UDP events will be received by an IP-level load
-balancer (running standalone or on the master?) which will then replicate them
-to all the members of the cluster. Slaves will process these events and record
-them in their local event log but only the Seguro master will actually emit
-their side effects back to the Urbit network.
+Note that we only care about write performance because database reads are not
+involved in the majority of Urbit's activities. Events are processed as follows:
 
-## Performance
+1. Compute event
+2. Commit event
+3. Release effect
 
-### Configuration
+All benchmarks were performed on the same
+[Linux box](https://www.amazon.com/Windows-Desktop-Computer-2500Mbps-Graphics/dp/B093V18HKB):
 
-Users will have the option to configure Seguro's degree of optimism. the number
-of healthy replicas must process an event before emitting its side effect from
-the master. For example, if set to 0, the master will receive, process and emit
-side effects from an event without waiting for any slaves in the cluster to
-acknowledge their successful reception and processing of said event. If set to
-N, where N is the number of slaves in the cluster, the master will wait for all
-of the slaves to process the event before emitting its side effects. 0 is most
-performant, N is most durable. In other words, setting a value of 0 tells Seguro
-to be "optimistic" about event replications, and N tells Seguro to be the
-opposite.
+- AMD Ryzen 5 4500U (6C/6T up to 4.0GHz)
+- 2x8GB DDR4 RAM
+- Samsung 980 PRO NVMe SSD
+- Ubuntu 20.04
 
-### Event Log Batching
+### Single writes
 
-An event log batching system could be designed and implemented to improve the
-performance of Seguro by way of reducing per-event processing and replication
-overhead (if there is any).
+| database | dqlite    | fdb       |
+| -------- | --------- | --------- |
+| events   | 4301      | 4096      |
+| errors   | 0         | 0         |
+| avg [ms] | 13.938089 | 6.344161  |
+| max [ms] | 91.736463 | 16.663706 |
+| min [ms] | 8.023056  | 2.627436  |
 
-## Snapshots & Event Log Truncation
+### Batch writes
 
-Seguro's support of optimistic run-ahead as defined in the Configuration section
-depends on coupling segments of the log to binary versions (for error handling
-and crash recovery), which depends on "epochs" and/or event log truncation.
-There is a [PR currently under review](https://github.com/urbit/urbit/pull/5701)
-which implements this feature. This PR assumes existence of a local log that can
-be subdivided into epochs where each epoch is coupled to a particular snapshot.
-If the log is moved off of the module, and epochs/truncation are supported,
-there will need to be some way to make sure that the relevant snapshots are
-persisted with the same durability on slave machines.
+| database   | dqlite    | fdb      |
+| ---------- | --------- | -------- |
+| events     | 4208      | 4096     |
+| batch size | 5         | 5        |
+| errors     | 0         | 0        |
+| avg [ms]   | 14.229881 | 0.739242 |
+| max [ms]   | 85.146681 | 2.399221 |
+| min [ms]   | 8.154588  | 0.573965 |
 
-## Previous Work
+### Fragmented single writes
 
-[Some effort](https://github.com/urbit/urbit/commit/cfeb35e37be63f96bb50fe1f60e2f59e35c07258)
-towards a goal similar to Seguro's has already been performed by Tlon
-engineering in the past. Adaption of dqlite/Raft for Urbit was conceived and
-researched as far back as 2013. The concept needs a responsible organization to
-champion it and provide resources and management so it can be finished. Rhe core
-architecture is sound and, given sufficient development resources, Seguro ought
-to be a reasonably achievable within a year's time.
+FoundationDB supports a maximum value size of 100KB and a recommended size of <
+10KB. For events that exceed these limits, we use a fragmentation algorithm to
+store them across multiple underlying database values. These benchmarks use a
+maximum database value size of 10KB, so a 100KB event would be split across 10
+or so underlying values. Dqlite value sizes are practically unlimited, so we
+don't include fragmented benchmarks for it.
 
-## Open Questions
+| database       | fdb      |
+| -------------- | -------- |
+| events         | 4096     |
+| event size     | 100KB    |
+| max value size | 10KB     |
+| errors         | 0        |
+| avg [ms]       | 4.816258 |
+| max [ms]       | 3.776849 |
+| min [ms]       | 0.572935 |
 
-1. Should the ordering of (compute event, commit event, release effect) change?
-   Why? How?
+### Fragmented batch writes
 
-2. What is the nature of dqlite integration? Are we making a new kind of pipe
-   where we control both sides and the remote talks to an arbitrary database, or
-   does the database have a client SDK that gets pushed into the runtime?
+| database       | fdb      |
+| -------------- | -------- |
+| events         | 4096     |
+| batch size     | 5        |
+| event size     | 100KB    |
+| max value size | 10KB     |
+| errors         | 0        |
+| avg [ms]       | 0.689704 |
+| max [ms]       | 1.447475 |
+| min [ms]       | 0.574091 |
 
-3. Should we "just" write a Nock hypervisor (have the runtime use a Nock core as
-   a hypervisor, rather than operating on the Arvo core)?
+## Conclusion
 
-4. What happens in case of failed nodes, master or slaves?
-5. How does automatic failover work?
-6. What are the recommended default settings for running Seguro in hosting
-   environments?
-
-# Worker Requirements
-
-Prospective candidates should have intermediate to advanced proficiency in the C
-programming language, a healthy appetite for Martian software (although no
-previous experienced with it is required), some previous experience with
-distributed systems, expertise in writing well-defined technical requirements
-and specifications, and strong coding and sytle habits. 3+ years of experience
-and a full-time commitment are also required. While no previous experience with
-Urbit is necessary, a candidate without it should be able to quickly demonstrate
-knowledge of the basics of the Urbit OS and its runtime (i.e., after reading the
-[whitepaper](https://media.urbit.org/whitepaper.pdf) or the relevant sections in
-the [docs](https://urbit.org/docs)).
-
-# Milestones
-
-A worker who can confidently commit to completion of the entire Seguro project,
-with all 3 of its milestones, is highly preferable. Guidance and leadership will
-be provided by ~mastyr-bottec of [Wexpert Systems](https://wexpert.systems).
-
-A salary of $XXX,XXX will be paid to the work on a bi-weekly basis throughout
-the duration of the bounty (one year). If the work is completed before the year
-is complete, ???. If completed after, ???...
-
-## Milestone 1 - Specification
-
-Write a detailed technical specification and have it reviewed by stakeholders
-(and perhaps additional technical Urbit authorities), accordingly revised, and
-ultimately approved for implementation.
-
-Expected Completion: ~3 months
-
-Deliverables:
-
-- Publication of a set of Markdown documents
-
-## Milestone 2 - Implementation
-
-Clean, legible code which clearly implements the specification. Where
-implementation of the specification as written is impossible or impractical, the
-specification should be updated accordingly after sufficient consideration and
-approval of the stakeholders.
-
-Expected Completion: ~3 months
-
-Deliverables:
-
-- A merged PR in the `urbit/urbit` repository
-
-## Milestone 3 - Testing, Integration, Communication
-
-Write a comprehensive test suite that guarantees operability of Seguro's
-specified features and use cases. Integrate Seguro features in a live hosting
-environment (maybe delete this one???).
-
-Expected Completion: ~3 months
-
-Deliverables:
-
-- A merged PR in the `urbit/urbit` repository
-- Overview of Seguro and demonstration of working system on Urbit Developer Call
-
-# Timeline
-
-This bounty should take one year to complete.
+FoundationDB wins.
