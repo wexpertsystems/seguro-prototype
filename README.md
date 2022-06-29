@@ -9,6 +9,8 @@ This repository implements benchmarks for [Dqlite](https://dqlite.io) and
 [FoundationDB](https://foundationdb.org) to determine their suitability for
 integration with `vere` as part of the Seguro project.
 
+## Build/Execution Instructions: See `databases/<db>`...
+
 ## Databases
 
 ### Dqlite
